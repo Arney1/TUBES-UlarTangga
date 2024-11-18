@@ -1,6 +1,7 @@
-#include "board.c"
+#include "game.c"
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void multiplayer(int players);
 int setDifficulty();
@@ -56,7 +57,18 @@ void multiplayer(int players) {
   Snake S[snakeCount];
   Ladder L[ladderCount];
   initiateBoard(snakeCount, ladderCount, S, L);
-  printBoard(S, L, playerArray, snakeCount, ladderCount, players, 10);
+  bool isRunning = true;
+  while (isRunning) {
+    for (int i = 0; i < players; i++) {
+      system("clear");
+      printBoard(S, L, playerArray, snakeCount, ladderCount, players, 10);
+      int temp;
+      getchar();
+      scanf("%d", &temp);
+      move(1, playerArray[i]);
+    }
+  }
+
   //   initiateBoard();
 }
 
