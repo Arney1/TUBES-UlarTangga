@@ -2,48 +2,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+// #include <string.h>
+#include "types.h"
 // #include <stdlib.h>
 
-typedef int Ladder[2];
-typedef int Snake[2];
-
+void getLadderSnakeCount(int *ladderCount, int *snakeCount, int difficulty);
+void searchPlayer(Player playerArray[], int playerCount, int blockNum,
+                  int playerHere[], int *playerHereCount);
+int compareAscending(const void *a, const void *b);
+int compareDescending(const void *a, const void *b);
+void printPlayerIcons(int playerNum, char colors[][7], int colorCount);
+void initiateBoard(int snakeCount, int ladderCount, Snake S[], Ladder L[]);
 void initiateLadders(int numLadders, int grid, int occupied[],
                      int *occupiedCount, Ladder arr[]);
 void initiateSnakes(int numSnakes, int grid, int occupied[], int *occupiedCount,
                     Snake arr[]);
+
 int searchNumber(int arr[], int size, int num);
 int searchNumber2D(int arr[][2], int col, int row, int num);
 
-int main() {
-  srand(time(0));
-  int n;
-  printf("berapa kali berapa: ");
-  scanf("%d", &n);
-  int ladderCount = 5;
-  int snakeCount = 5;
-  int occupied[(ladderCount + snakeCount) * 2];
-  int occupiedCount = 0;
-  Snake S[snakeCount];
-  Ladder L[ladderCount];
-  initiateLadders(ladderCount, n, occupied, &occupiedCount, L);
-  initiateSnakes(snakeCount, n, occupied, &occupiedCount, S);
-  //   Ladder L[ladderCount];
-  //   for (int i = 0; i < ladderCount; i++) {
-  //     scanf("%d %d", &L[i][0], &L[i][1]);
-  //   }
+void printBoard(Snake S[], Ladder L[], Player playerArray[], int snakeCount,
+                int ladderCount, int playerCount, int grid);
 
-  int gridNum = n * n;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
+void printBoard(Snake S[], Ladder L[], Player playerArray[], int snakeCount,
+                int ladderCount, int playerCount, int grid) {
+  int gridNum = grid * grid;
+  for (int i = 0; i < grid; i++) {
+    for (int j = 0; j < grid; j++) {
       printf("---------");
     }
     printf("\n");
-    for (int j = 0; j < n; j++) {
+    for (int j = 0; j < grid; j++) {
       int sum;
       if (i % 2 == 0) {
         sum = gridNum - j;
       } else {
-        sum = gridNum - n + 1 + j;
+        sum = gridNum - grid + 1 + j;
       }
 
       int ladderNum = searchNumber2D(L, 2, ladderCount, sum);
@@ -57,16 +51,54 @@ int main() {
       }
     }
     printf("\n");
-    for (int j = 0; j < n; j++) {
-      printf("        |");
-    }
-    printf("\n");
-    for (int j = 0; j < n; j++) {
+    for (int j = 0; j < grid; j++) {
       int sum;
       if (i % 2 == 0) {
         sum = gridNum - j;
       } else {
-        sum = gridNum - n + 1 + j;
+        sum = gridNum - grid + 1 + j;
+      }
+      char colors[4][7] = {"\033[31m", "\033[34m", "\033[32m", "\033[33m"};
+      int playerHere[playerCount];
+      int playerHereCount = 0;
+      searchPlayer(playerArray, playerCount, sum, playerHere, &playerHereCount);
+      if (playerHereCount == 4) {
+        printf("  ");
+
+        for (int k = 0; k < playerHereCount; k++) {
+          printPlayerIcons(k, colors, 4);
+        }
+        printf("  |");
+      } else if (playerHereCount == 3) {
+        printf("  ");
+
+        for (int k = 0; k < playerHereCount; k++) {
+          printPlayerIcons(k, colors, 4);
+        }
+        printf("   |");
+      } else if (playerHereCount == 2) {
+        printf("   ");
+        for (int k = 0; k < playerHereCount; k++) {
+          printPlayerIcons(k, colors, 4);
+        }
+        printf("   |");
+      } else if (playerHereCount == 1) {
+        printf("   ");
+        for (int k = 0; k < playerHereCount; k++) {
+          printPlayerIcons(k, colors, 4);
+        }
+        printf("    |");
+      } else {
+        printf("        |");
+      }
+    }
+    printf("\n");
+    for (int j = 0; j < grid; j++) {
+      int sum;
+      if (i % 2 == 0) {
+        sum = gridNum - j;
+      } else {
+        sum = gridNum - grid + 1 + j;
       }
 
       if (sum > 99) {
@@ -79,12 +111,21 @@ int main() {
     }
 
     printf("\n");
-    gridNum -= n;
+    gridNum -= grid;
   }
-  for (int j = 0; j < n; j++) {
+  for (int j = 0; j < grid; j++) {
     printf("---------");
   }
   printf("\n");
+}
+
+void initiateBoard(int snakeCount, int ladderCount, Snake S[], Ladder L[]) {
+  srand(time(0));
+  int n = 10;
+  int occupied[(ladderCount + snakeCount) * 2];
+  int occupiedCount = 0;
+  initiateLadders(ladderCount, n, occupied, &occupiedCount, L);
+  initiateSnakes(snakeCount, n, occupied, &occupiedCount, S);
 }
 
 void initiateLadders(int numLadders, int grid, int occupied[],
@@ -102,6 +143,7 @@ void initiateLadders(int numLadders, int grid, int occupied[],
         j++;
       }
     }
+    qsort(arr[i], 2, sizeof(arr[i][0]), compareAscending);
   }
 }
 
@@ -139,6 +181,66 @@ void initiateSnakes(int numSnakes, int grid, int occupied[], int *occupiedCount,
         (*occupiedCount)++;
         j++;
       }
+    }
+    qsort(arr[i], 2, sizeof(arr[i][0]), compareDescending);
+  }
+}
+
+int compareAscending(const void *a, const void *b) {
+  return (*(int *)a - *(int *)b);
+}
+
+int compareDescending(const void *a, const void *b) {
+  return (*(int *)b - *(int *)a);
+}
+
+void initiatePlayers(Player playerArray[], int playerCount) {
+  for (int i = 0; i < playerCount; i++) {
+    printf("Nama player ke-%d: ", i + 1);
+    getchar();
+    scanf("%49[^\n]", playerArray[i].name);
+    playerArray[i].position = 1;
+  }
+}
+void resetColor() { printf("\033[0m"); }
+
+void printPlayerIcons(int playerNum, char colors[][7], int colorCount) {
+  for (int i = 0; i < colorCount; i++) {
+    if (i == playerNum) {
+      printf("%s▣", colors[i]);
+      resetColor();
+    }
+  }
+}
+
+void printPlayers(Player playerArray[], int playerCount, char colors[][7],
+                  int colorCount) {
+  for (int i = 0; i < playerCount; i++) {
+    printPlayerIcons(i, colors, colorCount);
+    printf(": %s\n", playerArray[i].name);
+  }
+}
+
+void getLadderSnakeCount(int *ladderCount, int *snakeCount, int difficulty) {
+  if (difficulty == 1) {
+    *ladderCount = 7;
+    *snakeCount = 3;
+  } else if (difficulty == 2) {
+    *ladderCount = 5;
+    *snakeCount = 5;
+  } else if (difficulty == 3) {
+    *ladderCount = 3;
+    *snakeCount = 7;
+  }
+}
+
+void searchPlayer(Player playerArray[], int playerCount, int blockNum,
+                  int playerHere[], int *playerHereCount) {
+  *playerHereCount = 0;
+  for (int i = 0; i < playerCount; i++) {
+    if (blockNum == playerArray[i].position) {
+      playerHere[*playerHereCount] = i;
+      *playerHereCount += 1;
     }
   }
 }
