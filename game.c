@@ -1,7 +1,7 @@
 // #include <stdio.h>
 #include <stdlib.h>
 #include "board.c"
-void move(int n, Player player);
+void move(int n, Player *player);
 int rollDice();
 int checkLadderSnake(Player playerArray[], int playerNum, Ladder L[], Snake S[]);
 
@@ -11,6 +11,6 @@ int rollDice() {
     return (rand() % (max - min + 1) + min);
 }
 
-void move(int n, Player player) {
-    player.position += n;
+void move(int n, Player *player) {
+    (*player).position += n;
 }

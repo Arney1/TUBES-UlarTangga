@@ -66,26 +66,26 @@ void printBoard(Snake S[], Ladder L[], Player playerArray[], int snakeCount,
         printf("  ");
 
         for (int k = 0; k < playerHereCount; k++) {
-          printPlayerIcons(k, colors, 4);
+          printPlayerIcons(playerHere[k], colors, 4);
         }
         printf("  |");
       } else if (playerHereCount == 3) {
         printf("  ");
 
         for (int k = 0; k < playerHereCount; k++) {
-          printPlayerIcons(k, colors, 4);
+          printPlayerIcons(playerHere[k], colors, 4);
         }
         printf("   |");
       } else if (playerHereCount == 2) {
         printf("   ");
         for (int k = 0; k < playerHereCount; k++) {
-          printPlayerIcons(k, colors, 4);
+          printPlayerIcons(playerHere[k], colors, 4);
         }
         printf("   |");
       } else if (playerHereCount == 1) {
         printf("   ");
         for (int k = 0; k < playerHereCount; k++) {
-          printPlayerIcons(k, colors, 4);
+          printPlayerIcons(playerHere[k], colors, 4);
         }
         printf("    |");
       } else {

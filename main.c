@@ -65,7 +65,7 @@ void multiplayer(int players) {
       int temp;
       getchar();
       scanf("%d", &temp);
-      move(1, playerArray[i]);
+      move(temp, &playerArray[i]);
     }
   }
 
